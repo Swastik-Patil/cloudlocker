@@ -167,6 +167,15 @@ code {
   cursor: not-allowed;
 }
 
+.actions svg {
+  cursor: pointer;
+  margin: 0.5rem;
+}
+
+.actions svg:hover {
+  color: var(--indigo);
+}
+
 @media only screen and (max-width: 640px) {
   .mobile-scroll-lock {
     overflow: hidden;

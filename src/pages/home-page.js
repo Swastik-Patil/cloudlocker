@@ -14,6 +14,7 @@ export const HomePage = () => {
   const [isGridLayout, setIsGridLayout] = useState(true);
   const [files, setFiles] = useState([]);
   const [data, setData] = useState([]);
+  const [sharedFiles, setSharedFiles] = useState(null);
   const [filteredData, setFilteredData] = useState([]);
   const { user } = useAuth0();
   const [isOpen, setIsOpen] = useState(false);
@@ -33,10 +34,23 @@ export const HomePage = () => {
       .catch((error) => {
         console.error(error);
       });
+    get(
+      child(dbRef(database), `Shared/${String(user.email).split("@")[0]}/Files`)
+    )
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          let data = snapshot.val();
+          data = Object.keys(data).map((key) => data[key]);
+          setSharedFiles(data);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
     return () => {
       ReactModal.setAppElement(null);
     };
-  }, [user.sub]);
+  }, [user.sub, user.email]);
 
   const handleClick = (event) => {
     hiddenFileInput.current.click();
@@ -206,7 +220,7 @@ export const HomePage = () => {
               </div>
               <div className="code-snippet">
                 <div className="code-snippet__title_container">
-                  <span className="code-snippet__title">All Files</span>
+                  <span className="code-snippet__title">My Files</span>
                   <span className="code-snippet__layout_modifier">
                     {/* Grid Icon */}
                     <span
@@ -266,6 +280,71 @@ export const HomePage = () => {
                   </div>
                 </div>
               </div>
+
+              {sharedFiles && (
+                <div className="code-snippet">
+                  <div className="code-snippet__title_container">
+                    <span className="code-snippet__title">Shared Files</span>
+                    <span className="code-snippet__layout_modifier">
+                      {/* Grid Icon */}
+                      <span
+                        onClick={() => setIsGridLayout(true)}
+                        className={`code-snippet__layout_icon ${
+                          isGridLayout ? "active" : ""
+                        }`}
+                      >
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 14 14"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            clipRule="evenodd"
+                            d="M0 1C0 0.447715 0.447715 0 1 0H5C5.55228 0 6 0.447715 6 1V5C6 5.55228 5.55228 6 5 6H1C0.447715 6 0 5.55228 0 5V1ZM2 2H4V4H2V2ZM0 9C0 8.44772 0.447715 8 1 8H5C5.55228 8 6 8.44772 6 9V13C6 13.5523 5.55228 14 5 14H1C0.447715 14 0 13.5523 0 13V9ZM2 10H4V12H2V10ZM9 0C8.44772 0 8 0.447715 8 1V5C8 5.55228 8.44772 6 9 6H13C13.5523 6 14 5.55228 14 5V1C14 0.447715 13.5523 0 13 0H9ZM12 2H10V4H12V2ZM8 9C8 8.44772 8.44772 8 9 8H13C13.5523 8 14 8.44772 14 9V13C14 13.5523 13.5523 14 13 14H9C8.44772 14 8 13.5523 8 13V9ZM10 10H12V12H10V10Z"
+                            fill="currentColor"
+                          ></path>
+                        </svg>
+                      </span>
+                      {/* List Icon */}
+                      <span
+                        onClick={() => setIsGridLayout(false)}
+                        className={`code-snippet__layout_icon ${
+                          !isGridLayout ? "active" : ""
+                        }`}
+                      >
+                        <svg
+                          width="14"
+                          height="12"
+                          viewBox="0 0 14 12"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            clipRule="evenodd"
+                            d="M1 0C0.447715 0 0 0.447715 0 1C0 1.55228 0.447715 2 1 2H13C13.5523 2 14 1.55228 14 1C14 0.447715 13.5523 0 13 0H1ZM0 6C0 5.44772 0.447715 5 1 5H13C13.5523 5 14 5.44772 14 6C14 6.55228 13.5523 7 13 7H1C0.447715 7 0 6.55228 0 6ZM1 10C0.447715 10 0 10.4477 0 11C0 11.5523 0.447715 12 1 12H13C13.5523 12 14 11.5523 14 11C14 10.4477 13.5523 10 13 10H1Z"
+                            fill="currentColor"
+                          ></path>
+                        </svg>
+                      </span>
+                    </span>
+                  </div>
+                  <div className="code-snippet__container">
+                    <div className="code-snippet__wrapper">
+                      <pre className="code-snippet__body">
+                        {isGridLayout ? (
+                          <GridLayout data={sharedFiles} isShared={true} />
+                        ) : (
+                          <ListLayout data={sharedFiles} isShared={true} />
+                        )}
+                      </pre>
+                    </div>
+                  </div>
+                </div>
+              )}
             </>
           ) : (
             <div className="profile__details">

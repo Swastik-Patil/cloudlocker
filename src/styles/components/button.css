@@ -46,6 +46,14 @@
   background: rgba(255, 255, 255, 0.85);
 }
 
+.button--danger {
+  background-color: #ea2525d9;
+}
+
+.button--danger:hover {
+  background: #ea0f0fe6;
+}
+
 @media only screen and (max-width: 480px) {
   .button {
     /* responsive */
